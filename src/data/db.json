@@ -1,0 +1,40 @@
+{
+  "notes": [
+    {
+      "id": "1",
+      "title": "Meeting Notes",
+      "priority": "high",
+      "description": "Discuss project timeline and assign tasks for the next sprint."
+    },
+    {
+      "id": "2",
+      "title": "Grocery List",
+      "priority": "medium",
+      "description": "Buy milk, eggs, bread, and vegetables for the week."
+    },
+    {
+      "id": "3",
+      "title": "Book Recommendations",
+      "priority": "low",
+      "description": "Research and list books on React and TypeScript for the team."
+    },
+    {
+      "id": "4",
+      "title": "Doctor Appointment",
+      "priority": "high",
+      "description": "Schedule annual check-up with Dr. Smith on Friday."
+    },
+    {
+      "id": "5",
+      "title": "Workout Plan",
+      "priority": "medium",
+      "description": "Create a workout plan for the next month, focusing on cardio."
+    },
+    {
+      "id": "6",
+      "title": "Birthday Party",
+      "priority": "low",
+      "description": "Plan a surprise birthday party for Sarah on the 25th."
+    }
+  ]
+}
