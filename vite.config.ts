@@ -26,5 +26,8 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
+    watch: {
+      ignored: ["**/src/data/*.json"],
+    },
   },
 });

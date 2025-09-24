@@ -6,6 +6,11 @@ export const fetchNotes = async (): Promise<Note[]> => {
   return res.data;
 };
 
+export const fetchNote = async (id: string): Promise<Note> => {
+  const res = await api.get(`/notes/${id}`);
+  return res.data;
+};
+
 export const createNote = async (newNote: {
   id: string;
   title: string;
@@ -21,4 +26,17 @@ export const createNote = async (newNote: {
 
 export const deleteNote = async (noteId: string) => {
   await api.delete(`/notes/${noteId}`);
+};
+
+export const editNote = async (
+  noteId: string,
+  updatedNote: {
+    title: string;
+    priority: string;
+    description: string;
+    createdAt?: string;
+  }
+): Promise<Note> => {
+  const res = await api.put(`/notes/${noteId}`, updatedNote);
+  return res.data;
 };

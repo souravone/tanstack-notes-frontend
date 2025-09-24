@@ -1,27 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useForm } from "@tanstack/react-form";
-
+import { editNote, fetchNote } from "@/api/notes";
 import { FieldInfo } from "@/utils/fieldInfo";
-import z from "zod";
+import { useForm } from "@tanstack/react-form";
 import {
   queryOptions,
   useMutation,
-  useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-import { createNote, deleteNote, fetchNotes } from "@/api/notes";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 
 type InitialFormValue = {
   title: string;
   priority: string;
   description: string;
-};
-
-const initialValue: InitialFormValue = {
-  title: "",
-  priority: "Medium",
-  description: "",
 };
 
 const priorityOptions = [
@@ -34,63 +26,49 @@ const noteFormSchema = z.object({
   priority: z.enum(["High", "Medium", "Low"], {
     errorMap: () => ({ message: "Please select a category" }),
   }),
+
   description: z.string().min(6, "Description should be at least 6 characters"),
 });
 
-const notesQueryOptions = () =>
+const noteQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: ["notes"],
-    queryFn: fetchNotes,
+    queryKey: ["note", id],
+    queryFn: () => fetchNote(id),
   });
 
-export const Route = createFileRoute("/")({
-  component: App,
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(notesQueryOptions()),
+export const Route = createFileRoute("/$editNote/")({
+  component: EditNotePage,
+  loader: ({ params, context }) =>
+    context.queryClient.ensureQueryData(noteQueryOptions(params.editNote)),
 });
 
-function App() {
-  const queryClient = useQueryClient();
-
-  // const [notes, setNotes] = useState<Note[]>([]);
-  const { data: notes } = useSuspenseQuery(notesQueryOptions());
-
-  const { mutateAsync: createNoteMutate, isPending } = useMutation({
-    mutationFn: createNote,
+function EditNotePage() {
+  const navigate = useNavigate();
+  const { editNote: noteId } = Route.useParams();
+  const { data: note } = useSuspenseQuery(noteQueryOptions(noteId));
+  const { mutateAsync: updateNote, isPending } = useMutation({
+    mutationFn: (updated: InitialFormValue) => editNote(noteId, updated),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-    },
-    onError: (error) => {
-      console.error("Error creating note:", error);
-    },
-  });
-
-  const { mutateAsync: deleteNoteMutate } = useMutation({
-    mutationFn: (id: string) => deleteNote(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-    },
-    onError: (error) => {
-      console.error("Error deleting note:", error);
+      navigate({ to: "/" });
     },
   });
 
   const form = useForm({
-    defaultValues: initialValue,
+    defaultValues: note as InitialFormValue,
     validators: {
       onChange: noteFormSchema,
       onSubmit: noteFormSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        await createNoteMutate({ ...value, id: Date.now().toString() });
-        form.reset();
-      } catch (error) {
-        console.error("Failed to create note:", error);
+      {
+        try {
+          await updateNote(value);
+        } catch (err) {
+          console.log(err);
+        }
       }
     },
   });
-
   return (
     <div className="max-w-6xl mx-auto my-6">
       <form
@@ -165,44 +143,10 @@ function App() {
             )}
           </form.Field>
           <button type="submit" className="btn-primary mt-4">
-            {isPending ? "Adding Note..." : "Add Note"}
+            {isPending ? "Editing..." : "Edit Note"}
           </button>
         </div>
       </form>
-      <section className="my-10 max-w-6xl">
-        <h1 className="text-2xl font-semibold my-4"> Notes</h1>
-        <div className="grid grid-cols-3 gap-4 p-4">
-          {notes.map((note) => (
-            <div
-              className="border-2 p-4 bg-white rounded-md shadow flex flex-col gap-6"
-              key={note.id}
-            >
-              <div className="">
-                <h2 className="text-lg font-semibold">{note.title}</h2>
-                <p className="font-sm text-indigo-500">{note.priority}</p>
-                <p className="mt-2 leading-none">{note.description}</p>
-              </div>
-              <div className="flex justify-between">
-                <Link
-                  to="/$editNote"
-                  params={{ editNote: note.id.toString() }}
-                  type="button"
-                  className="btn-primary"
-                >
-                  Edit Note
-                </Link>
-                <button
-                  onClick={() => deleteNoteMutate(note.id)}
-                  className="btn-secondary"
-                  type="button"
-                >
-                  Delete Note
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

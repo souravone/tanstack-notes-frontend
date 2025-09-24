@@ -3,4 +3,5 @@ export type Note = {
   title: string;
   priority: string;
   description: string;
+  createdAt?: string;
 };

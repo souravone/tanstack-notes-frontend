@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterPageIndexRouteImport } from './routes/registerPage/index'
 import { Route as LoginPageIndexRouteImport } from './routes/loginPage/index'
+import { Route as EditNoteIndexRouteImport } from './routes/$editNote/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
 import { Route as DemoStoreRouteImport } from './routes/demo.store'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo.form.simple'
@@ -30,6 +31,11 @@ const RegisterPageIndexRoute = RegisterPageIndexRouteImport.update({
 const LoginPageIndexRoute = LoginPageIndexRouteImport.update({
   id: '/loginPage/',
   path: '/loginPage/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditNoteIndexRoute = EditNoteIndexRouteImport.update({
+  id: '/$editNote/',
+  path: '/$editNote/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/$editNote': typeof EditNoteIndexRoute
   '/loginPage': typeof LoginPageIndexRoute
   '/registerPage': typeof RegisterPageIndexRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/$editNote': typeof EditNoteIndexRoute
   '/loginPage': typeof LoginPageIndexRoute
   '/registerPage': typeof RegisterPageIndexRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/$editNote/': typeof EditNoteIndexRoute
   '/loginPage/': typeof LoginPageIndexRoute
   '/registerPage/': typeof RegisterPageIndexRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/store'
     | '/demo/tanstack-query'
+    | '/$editNote'
     | '/loginPage'
     | '/registerPage'
     | '/demo/form/address'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/store'
     | '/demo/tanstack-query'
+    | '/$editNote'
     | '/loginPage'
     | '/registerPage'
     | '/demo/form/address'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/store'
     | '/demo/tanstack-query'
+    | '/$editNote/'
     | '/loginPage/'
     | '/registerPage/'
     | '/demo/form/address'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  EditNoteIndexRoute: typeof EditNoteIndexRoute
   LoginPageIndexRoute: typeof LoginPageIndexRoute
   RegisterPageIndexRoute: typeof RegisterPageIndexRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/loginPage'
       fullPath: '/loginPage'
       preLoaderRoute: typeof LoginPageIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$editNote/': {
+      id: '/$editNote/'
+      path: '/$editNote'
+      fullPath: '/$editNote'
+      preLoaderRoute: typeof EditNoteIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  EditNoteIndexRoute: EditNoteIndexRoute,
   LoginPageIndexRoute: LoginPageIndexRoute,
   RegisterPageIndexRoute: RegisterPageIndexRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
