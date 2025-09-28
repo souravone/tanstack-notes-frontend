@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 
 import { FieldInfo } from "@/utils/fieldInfo";
@@ -11,6 +11,8 @@ import {
 } from "@tanstack/react-query";
 
 import { createNote, deleteNote, fetchNotes } from "@/api/notes";
+import { useSession } from "@/lib/auth";
+import { useEffect } from "react";
 
 type InitialFormValue = {
   title: string;
@@ -42,6 +44,10 @@ const notesQueryOptions = () =>
   queryOptions({
     queryKey: ["notes"],
     queryFn: fetchNotes,
+    retry: (failuteCount, error: any) => {
+      if (error?.status === 401) return false;
+      return failuteCount < 3;
+    },
   });
 
 export const Route = createFileRoute("/")({
@@ -51,8 +57,16 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: notes } = useSuspenseQuery(notesQueryOptions());
+  const { data: session, isPending: sessionLoading } = useSession();
+
+  useEffect(() => {
+    if (!sessionLoading && !session) {
+      navigate({ to: "/loginPage" });
+    }
+  }, [session, sessionLoading, navigate]);
 
   const { mutateAsync: createNoteMutate, isPending } = useMutation({
     mutationFn: createNote,
@@ -89,7 +103,17 @@ function App() {
       }
     },
   });
+  if (sessionLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
 
+  if (!session) {
+    return null; // Will redirect to login
+  }
   return (
     <div className="max-w-6xl mx-auto my-6">
       <form

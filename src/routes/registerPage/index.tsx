@@ -1,7 +1,9 @@
 import { FieldInfo } from "@/utils/fieldInfo";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+import { signUp, useSession } from "@/lib/auth";
+import { useEffect } from "react";
 
 type InitialFormValue = {
   name: string;
@@ -37,14 +39,36 @@ export const Route = createFileRoute("/registerPage/")({
 });
 
 function RegisterPage() {
+  const navigage = useNavigate();
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session) {
+      navigage({ to: "/" });
+    }
+  }, [session, navigage]);
+
   const form = useForm({
     defaultValues: initialValue as InitialFormValue,
     validators: {
       onChange: loginFormSchema,
     },
-    onSubmit: ({ value }) => {
-      alert(JSON.stringify(value));
-      console.log(value);
+    onSubmit: async ({ value }) => {
+      try {
+        const result = await signUp.email({
+          name: value.name,
+          email: value.email,
+          password: value.password,
+        });
+
+        if (result.error) {
+          console.error("Login failed");
+        } else {
+          navigage({ to: "/" });
+        }
+      } catch (err) {
+        console.log("Problem while signing in", err);
+      }
     },
   });
   return (

@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { useSession, signOut } from "@/lib/auth";
 
 function Header() {
+  const { data: session, isPending } = useSession();
+  const handleSignout = async () => {
+    await signOut();
+  };
   return (
     <header className="border-b-2 border-b-gray-800 px-8 py-4 bg-fuchsia-300">
       <nav className="flex justify-between items-center max-w-6xl mx-auto">
@@ -8,8 +13,26 @@ function Header() {
           MERN CRUD Notes
         </Link>
         <div className="font-semibold flex gap-4">
-          <Link to="/loginPage">Login</Link>
-          <Link to="/registerPage">Register</Link>
+          {isPending ? (
+            <span>Loading...</span>
+          ) : session?.user ? (
+            <>
+              <span className="text-gray-700">
+                Welcome, {session.user.name}
+              </span>
+              <button
+                onClick={handleSignout}
+                className="text-rose-500 hover:text-rose-600 transition cursor-pointer"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/loginPage">Login</Link>
+              <Link to="/registerPage">Register</Link>
+            </>
+          )}
         </div>
       </nav>
     </header>
