@@ -44,8 +44,10 @@ export const Route = createFileRoute("/$editNote/")({
 
 function EditNotePage() {
   const navigate = useNavigate();
+
   const { editNote: noteId } = Route.useParams();
   const { data: note } = useSuspenseQuery(noteQueryOptions(noteId));
+
   const { mutateAsync: updateNote, isPending } = useMutation({
     mutationFn: (updated: InitialFormValue) => editNote(noteId, updated),
     onSuccess: () => {
@@ -60,12 +62,10 @@ function EditNotePage() {
       onSubmit: noteFormSchema,
     },
     onSubmit: async ({ value }) => {
-      {
-        try {
-          await updateNote(value);
-        } catch (err) {
-          console.log(err);
-        }
+      try {
+        await updateNote(value);
+      } catch (err) {
+        console.log(err);
       }
     },
   });
@@ -142,7 +142,11 @@ function EditNotePage() {
               </div>
             )}
           </form.Field>
-          <button type="submit" className="btn-primary mt-4">
+          <button
+            disabled={isPending}
+            type="submit"
+            className="btn-primary mt-4"
+          >
             {isPending ? "Editing..." : "Edit Note"}
           </button>
         </div>

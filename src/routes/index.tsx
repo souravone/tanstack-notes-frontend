@@ -29,6 +29,7 @@ const priorityOptions = [
   { name: "Medium", value: "Medium" },
   { name: "Low", value: "Low" },
 ];
+
 const noteFormSchema = z.object({
   title: z.string().min(3, "Title should be at least 3 characters"),
   priority: z.enum(["High", "Medium", "Low"], {
@@ -51,8 +52,6 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const queryClient = useQueryClient();
-
-  // const [notes, setNotes] = useState<Note[]>([]);
   const { data: notes } = useSuspenseQuery(notesQueryOptions());
 
   const { mutateAsync: createNoteMutate, isPending } = useMutation({
@@ -175,7 +174,7 @@ function App() {
           {notes.map((note) => (
             <div
               className="border-2 p-4 bg-white rounded-md shadow flex flex-col gap-6"
-              key={note.id}
+              key={note._id}
             >
               <div className="">
                 <h2 className="text-lg font-semibold">{note.title}</h2>
@@ -185,14 +184,14 @@ function App() {
               <div className="flex justify-between">
                 <Link
                   to="/$editNote"
-                  params={{ editNote: note.id.toString() }}
+                  params={{ editNote: note._id.toString() }}
                   type="button"
                   className="btn-primary"
                 >
                   Edit Note
                 </Link>
                 <button
-                  onClick={() => deleteNoteMutate(note.id)}
+                  onClick={() => deleteNoteMutate(note._id)}
                   className="btn-secondary"
                   type="button"
                 >

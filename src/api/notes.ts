@@ -17,7 +17,7 @@ export const createNote = async (newNote: {
   priority: string;
   description: string;
 }): Promise<Note> => {
-  const res = await api.post("/notes", {
+  const res = await api.post("/notes/new", {
     ...newNote,
     createdAt: new Date().toISOString(),
   });
